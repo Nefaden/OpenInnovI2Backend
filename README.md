@@ -19,6 +19,35 @@ pip3 install -requirements.txt
 ## Install tensorflow
 * Link : https://www.tensorflow.org/install/pip
 
+Créez un environnement virtuel en choisissant un interpréteur Python, puis en créant un répertoire ./venv :
+```sh
+python3 -m venv --system-site-packages ./venv
+```
+
+Activez l'environnement virtuel à l'aide d'une commande spécifique à l'interface système :
+```sh
+source ./venv/bin/activate  # sh, bash, or zsh
+
+. ./venv/bin/activate.fish  # fish
+
+source ./venv/bin/activate.csh  # csh or tcsh
+```
+
+Lorsque l'environnement virtuel est actif, l'invite de l'interface système est précédée par le préfixe (venv).
+
+Installez des packages dans un environnement virtuel sans modifier la configuration du système hôte. Pour ce faire, commencez par mettre à niveau pip :
+```sh
+pip install --upgrade pip
+
+pip list  # show packages installed within the virtual environment
+```
+
+Pour quitter l'environnement virtuel :
+```sh
+deactivate  # don't exit until you're done using TensorFlow
+```
+
+Installer tensorflow :
 ```sh
 !pip3 install tensorflow_io
 ```
