@@ -2,6 +2,8 @@
 ![Version](https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000)
 [![Twitter: YannDurand11](https://img.shields.io/twitter/follow/YannDurand11.svg?style=social)](https://twitter.com/YannDurand11)
 
+RUN pip install --no-cache-dir -r requirements.txt
+
 > Open Innovation's project IA prediction
 
 ## Install all dependencies
@@ -49,9 +51,41 @@ deactivate  # don't exit until you're done using TensorFlow
 
 Installer tensorflow :
 ```sh
-!pip3 install tensorflow_io
+pip3 install tensorflow_io
 ```
 
+## Using Docker
+
+Adapt the dockerfile.dist file as your own dockerfile
+
+Build dockerfile :
+```sh
+docker build --rm -f Dockerfile -t your_container_docker_name .
+```
+
+Executing docker container interactively :
+```sh
+docker exec -it [container_name] bash
+``` 
+
+And then, execute pyscript like on an usual computer
+
+In order to exit the container : 
+```sh
+exit
+```
+
+If you'd modified the script or any files and don't want to rebuild, because of the long processing, do :
+```sh
+docker cp [path_to_your_file] [container_id]:/[path_to_cp_your_file]
+```
+
+**WARNING** Soundfile dependancie will not install libsndfile, due to linux system. So do before executing pyscript:
+```sh
+apt-get install libsndfile1
+```
+
+And press Y when asking
 ## Author
 
 👤 **Yann Durand**

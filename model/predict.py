@@ -1,3 +1,4 @@
+import os
 import IPython.display as ipd
 # % pylab inline
 import os
@@ -15,19 +16,20 @@ from sklearn.datasets import make_regression
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import LabelEncoder
-from sklearn.externals.joblib import dump, load
+# from sklearn.externals.joblib import dump, load
+from joblib import dump, load
+from sklearn import metrics 
+
+import numpy as np
 
 from keras.utils.np_utils import to_categorical
 from keras.callbacks import EarlyStopping
 from keras import regularizers
-
-import numpy as np
 from keras.models import Sequential,load_model
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
 from keras.optimizers import Adam
 from keras.utils import np_utils
-from sklearn import metrics 
 
 import tensorflow_io as tfio
 import tensorflow as tf
@@ -43,15 +45,21 @@ import matplotlib.pyplot as plt
 import pulsar
 from pulsar.schema import *
 
+# Shall be moved to server config later
+from dotenv import load_dotenv
+load_dotenv()
+
 # loading the model into the session created above
-model = load_model('')
-stmTime = pathlib.Path('').stat().st_mtime
-service_url = ''
-topic = ''
-subscription = ""
-ack_grouping_time=1
-token=''
-receiver_q_size = 10
+model = load_model(os.getenv("MODEL"))
+stmTime = pathlib.Path(os.getenv("MODEL")).stat().st_mtime
+service_url = os.getenv("PULSAR_URL")
+topic = os.getenv("PULSAR_TOPIC")
+subscription = os.getenv("PULSAR_SUBSCRIPTION")
+ack_grouping_time = os.getenv("PULSAR_GROUP_TIME")
+# token='eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik5rRXdSVVU1TUVOQlJrWTJNalEzTVRZek9FVkZRVVUyT0RNME5qUkRRVEU1T1VNMU16STVPUSJ9.eyJodHRwczovL3N0cmVhbW5hdGl2ZS5pby91c2VybmFtZSI6ImlhZmVlZEBhc2FleS1vaW5ub3YuYXV0aC5zdHJlYW1uYXRpdmUuY2xvdWQiLCJpc3MiOiJodHRwczovL2F1dGguc3RyZWFtbmF0aXZlLmNsb3VkLyIsInN1YiI6ImRFUXBkTVpPVTRBUkVGV3lhNmZtVlkwZnV3S2JBTzdPQGNsaWVudHMiLCJhdWQiOiJ1cm46c246cHVsc2FyOmFzYWV5LW9pbm5vdjptYWluLW5vZGUiLCJpYXQiOjE2MTM3MjQ3NzMsImV4cCI6MTYxNDMyOTU3MywiYXpwIjoiZEVRcGRNWk9VNEFSRUZXeWE2Zm1WWTBmdXdLYkFPN08iLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMiLCJwZXJtaXNzaW9ucyI6W119.gH5_XNBNBYtt1wWyWXS2PzgYNsnXz_AYD53f-qUdRk8y_c4Co1uvhZL3Crz7QjHIQYbvYPwl4oePdzY68B7ng1nFWv7F_tZoZURDITkW7ROLYZxhAgQngidlikN_30CCXpt64yuG5Qj_wo7dtMyfTw59JEv5ADo_PPzODQF25ASNQGtdmmZZp_R6VPe-_VOyFjHCgIc8shPM80s8rUFEJamkF98Tf8AesJmtkLKS5JxbNQbSAD6hedPjQuG4q0mJrZWjeXAMdWLaBhMxiCSA30-7dZ8IjFuhJj2wUlBYeXDO7tXAmdPO1ZcUoYT8s1SEZ1NkY9NSwlpgGGofYdRHMQ'
+token=os.getenv("PULSAR_TOKEN")
+
+receiver_q_size = os.getenv("PULSAR_Q_SIZE")
 
 class File(Record):
     path = String()
@@ -65,14 +73,14 @@ consumer = client.create_reader(topic,pulsar.MessageId.latest,receiver_queue_siz
 producer = client.create_producer(topic,schema=AvroSchema(File))
 
 # Change speaker with the created room's ID (queue)
-producer.send(File(path='',name='103-1240-0015.flac',speaker=103))
-producer.send(File(path='',name='103-1240-0011.flac',speaker=103))
-producer.send(File(path='',name='103-1240-0024.flac',speaker=103))
-producer.send(File(path='',name='103-1240-0030.flac',speaker=103))
-producer.send(File(path='',name='103-1240-0057.flac',speaker=103))
-producer.send(File(path='',name='118-47824-0038.flac',speaker=103))
-producer.send(File(path='',name='118-47824-0034.flac',speaker=103))
-producer.send(File(path='',name='mardi à 13-04.m4a',speaker=912))
+producer.send(File(path='voices/8975-270782-0000.flac',name='8975-270782-0000.flac',speaker=103))
+# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/103/1240/103-1240-0011.flac',name='103-1240-0011.flac',speaker=103))
+# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/103/1240/103-1240-0024.flac',name='103-1240-0024.flac',speaker=103))
+# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/103/1240/103-1240-0030.flac',name='103-1240-0030.flac',speaker=103))
+# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/103/1240/103-1240-0057.flac',name='103-1240-0057.flac',speaker=103))
+# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/118/47824/118-47824-0038.flac',name='118-47824-0038.flac',speaker=103))
+# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/118/47824/118-47824-0034.flac',name='118-47824-0034.flac',speaker=103))
+# producer.send(File(path='/content/drive/My Drive/DataSet/VoicePerso/Test 1 - EC/Test/mardi à 13-04.m4a',name='mardi à 13-04.m4a',speaker=912))
 
 # Although this function was modified and many parameteres were explored with, most of it
 # came from Source 8 (sources in the READ.ME)
@@ -107,19 +115,19 @@ def extract_features(files):
 
 model.summary()
 
-labels = np.load('')
-ss = load('')
+labels = np.load(os.getenv("CLASSES"))
+ss = load(os.getenv("SCALER"))
 
 lb = LabelEncoder()
 lb.fit(labels)
 while True:
   msg = consumer.read_next()
-  st = pathlib.Path('').stat().st_mtime
+  st = pathlib.Path(os.getenv("MODEL")).stat().st_mtime
   if st > stmTime :
     stmTime = st
-    model = load_model('') 
-    labels = np.load('')
-    ss = load('')
+    model = load_model(os.getenv("MODEL")) 
+    labels = np.load(os.getenv("CLASSES"))
+    ss = load(os.getenv("SCALER"))
   model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam') 
   content = msg.value()
   file = pd.DataFrame([[content.path,content.name]],columns= ['path','file'])
