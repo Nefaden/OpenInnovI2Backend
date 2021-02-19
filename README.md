@@ -2,9 +2,7 @@
 ![Version](https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000)
 [![Twitter: YannDurand11](https://img.shields.io/twitter/follow/YannDurand11.svg?style=social)](https://twitter.com/YannDurand11)
 
-RUN pip install --no-cache-dir -r requirements.txt
-
-> Open Innovation's project IA prediction
+> Open Innovation's project IA prediction to predict actors by using his voice
 
 ## Install all dependencies
 
@@ -21,12 +19,12 @@ pip3 install -requirements.txt
 ## Install tensorflow
 * Link : https://www.tensorflow.org/install/pip
 
-Créez un environnement virtuel en choisissant un interpréteur Python, puis en créant un répertoire ./venv :
+Create a python virtual environment and a repository ./venv :
 ```sh
 python3 -m venv --system-site-packages ./venv
 ```
 
-Activez l'environnement virtuel à l'aide d'une commande spécifique à l'interface système :
+Activate this virutal env :
 ```sh
 source ./venv/bin/activate  # sh, bash, or zsh
 
@@ -35,21 +33,21 @@ source ./venv/bin/activate  # sh, bash, or zsh
 source ./venv/bin/activate.csh  # csh or tcsh
 ```
 
-Lorsque l'environnement virtuel est actif, l'invite de l'interface système est précédée par le préfixe (venv).
+When the venv is active, the CLI prefix shall be "venv"
 
-Installez des packages dans un environnement virtuel sans modifier la configuration du système hôte. Pour ce faire, commencez par mettre à niveau pip :
+Install packages and dependancies in the virtual env, without modifying host system's configuration :
 ```sh
 pip install --upgrade pip
 
 pip list  # show packages installed within the virtual environment
 ```
 
-Pour quitter l'environnement virtuel :
+In order to exit the venv :
 ```sh
 deactivate  # don't exit until you're done using TensorFlow
 ```
 
-Installer tensorflow :
+Install tensorflow :
 ```sh
 pip3 install tensorflow_io
 ```
