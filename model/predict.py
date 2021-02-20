@@ -1,7 +1,7 @@
 import os
+import json
 import IPython.display as ipd
 # % pylab inline
-import os
 import pandas as pd
 import librosa
 import glob 
@@ -57,29 +57,30 @@ topic = os.getenv("PULSAR_TOPIC")
 subscription = os.getenv("PULSAR_SUBSCRIPTION")
 ack_grouping_time = os.getenv("PULSAR_GROUP_TIME")
 token=os.getenv("PULSAR_TOKEN")
-
-receiver_q_size = os.getenv("PULSAR_Q_SIZE")
+# receiver_q_size = os.getenv("PULSAR_Q_SIZE")
+receiver_q_size = 10
 
 class File(Record):
+    path = String()
+    name = String()
+    user = String()
+
+class Prediction(Record):
     path = String()
     name = String()
     speaker = Integer()
 
 #Pulsar = tfio.experimental.streaming.PulsarIODataset(service_url,topic,subscription,100,1,100)
 #tfio.IODataset()
-client = pulsar.Client(service_url,pulsar.AuthenticationToken(token))
-consumer = client.create_reader(topic,pulsar.MessageId.latest,receiver_queue_size=receiver_q_size,reader_name=subscription,schema=AvroSchema(File))
-producer = client.create_producer(topic,schema=AvroSchema(File))
+client = pulsar.Client(service_url, pulsar.AuthenticationToken(token))
+consumer = client.create_reader(topic,pulsar.MessageId.latest, receiver_queue_size=receiver_q_size, reader_name=subscription, schema=AvroSchema(File))
+producer = client.create_producer(topic)
+directory = os.fsencode('voices/')
 
 # Change speaker with the created room's ID (queue)
-producer.send(File(path='voices/8975-270782-0000.flac',name='8975-270782-0000.flac',speaker=103))
-# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/103/1240/103-1240-0011.flac',name='103-1240-0011.flac',speaker=103))
-# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/103/1240/103-1240-0024.flac',name='103-1240-0024.flac',speaker=103))
-# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/103/1240/103-1240-0030.flac',name='103-1240-0030.flac',speaker=103))
-# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/103/1240/103-1240-0057.flac',name='103-1240-0057.flac',speaker=103))
-# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/118/47824/118-47824-0038.flac',name='118-47824-0038.flac',speaker=103))
-# producer.send(File(path='/content/drive/My Drive/DataSet/train-clean-100/118/47824/118-47824-0034.flac',name='118-47824-0034.flac',speaker=103))
-# producer.send(File(path='/content/drive/My Drive/DataSet/VoicePerso/Test 1 - EC/Test/mardi à 13-04.m4a',name='mardi à 13-04.m4a',speaker=912))
+# for file in os.listdir(directory):
+#       flac_name = os.fsdecode(file)
+#       producer.send(File(path='voices/' + flac_name, name=flac_name, speaker=103))
 
 # Although this function was modified and many parameteres were explored with, most of it
 # came from Source 8 (sources in the READ.ME)
@@ -129,7 +130,7 @@ while True:
     ss = load(os.getenv("SCALER"))
   model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam') 
   content = msg.value()
-  file = pd.DataFrame([[content.path,content.name]],columns= ['path','file'])
+  file = pd.DataFrame([[content.path, content.name]], columns= ['path','file'])
   features_label = file.apply(extract_features, axis=1)
   # We create an empty list where we will concatenate all the features into one long feature
   # for each file to feed into our neural network 
@@ -147,3 +148,5 @@ while True:
   print(preds)
   preds = lb.inverse_transform(preds)
   print(preds)
+  producer = client.create_producer(content.user, schema=JsonSchema(Prediction))
+  producer.send(Prediction(path=content.path, name=content.name, speaker=int(preds[0])))
