@@ -130,3 +130,8 @@ dmypy.json
 
 # Dockerfile shall be ignored
 Dockerfile
+
+# Files used to train
+model/voices
+model/features_label
+model/VoicePerso

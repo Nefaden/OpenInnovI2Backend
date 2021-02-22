@@ -10,12 +10,12 @@ import random
 import math
 import pathlib
 
-from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split, GridSearchCV
 # from sklearn.externals.joblib import dump, load
 from joblib import dump, load
 from sklearn import metrics 
@@ -53,7 +53,7 @@ load_dotenv()
 model = load_model(os.getenv("MODEL"))
 stmTime = pathlib.Path(os.getenv("MODEL")).stat().st_mtime
 service_url = os.getenv("PULSAR_URL")
-topic = os.getenv("PULSAR_TOPIC")
+topic = os.getenv("PULSAR_PREDICT_TOPIC")
 subscription = os.getenv("PULSAR_SUBSCRIPTION")
 ack_grouping_time = os.getenv("PULSAR_GROUP_TIME")
 token=os.getenv("PULSAR_TOKEN")
@@ -75,7 +75,7 @@ class Prediction(Record):
 client = pulsar.Client(service_url, pulsar.AuthenticationToken(token))
 consumer = client.create_reader(topic,pulsar.MessageId.latest, receiver_queue_size=receiver_q_size, reader_name=subscription, schema=AvroSchema(File))
 producer = client.create_producer(topic)
-directory = os.fsencode('voices/')
+# directory = os.fsencode('voices/')
 
 # Change speaker with the created room's ID (queue)
 # for file in os.listdir(directory):
