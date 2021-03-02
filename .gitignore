@@ -135,3 +135,5 @@ Dockerfile
 model/voices
 model/features_label
 model/VoicePerso
+
+ .passwd-s3fs
