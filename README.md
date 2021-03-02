@@ -84,6 +84,69 @@ apt-get install libsndfile1
 ```
 
 And press Y when asking
+
+## Using Bucket S3 with aws CLI
+
+Tutorial link : https://www.scaleway.com/en/docs/object-storage-with-aws-cli/
+
+If you're using a S3 bucket, you need to set-up an aws config (or whatever else). This is done by editing the config file. Basically, the aws cli is installed in the requirements.txt. 
+
+In order to edit the config file, you need to
+- create the file
+```sh
+aws configure set plugins.endpoint awscli_plugin_endpoint
+```
+
+- access where file is
+```sh
+cd ~/.aws/
+vim config
+```
+
+- Edit it like this : 
+```
+[plugins]
+endpoint = awscli_plugin_endpoint
+
+[default]
+region = nl-ams
+s3 =
+  endpoint_url = https://s3.nl-ams.scw.cloud
+  signature_version = s3v4
+  max_concurrent_requests = 100
+  max_queue_size = 1000
+  multipart_threshold = 50MB
+  # Edit the multipart_chunksize value according to the file sizes that you want to upload. The present configuration allows to upload files up to 10 GB (100 requests * 10MB). For example setting it to 5GB allows you to upload files up to 5TB.
+  multipart_chunksize = 10MB
+s3api =
+  endpoint_url = https://s3.nl-ams.scw.cloud 
+```
+
+Precise your own region and url endpoint of yours
+
+After this, precise your credentials in the credentials files
+
+- create the file
+```sh
+aws configure
+```
+
+- Edit like this
+```
+[default]
+aws_access_key_id=<ACCESS_KEY>
+aws_secret_access_key=<SECRET_KEY>
+```
+
+## Using S3 Scaleway with s3fs
+
+https://www.scaleway.com/en/docs/object-storage-with-s3fs/ 
+
+Install s3fs
+```sh
+apt -y install automake autotools-dev fuse g++ git libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config
+```
+
 ## Author
 
 👤 **Yann Durand**

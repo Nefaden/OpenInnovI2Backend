@@ -1,4 +1,5 @@
 import os
+os.environ.setdefault('PATH', '')
 import json
 import IPython.display as ipd
 # % pylab inline
@@ -51,12 +52,14 @@ load_dotenv()
 
 #list the files
 folderlist = os.listdir('voices/') 
+print(folderlist)
 #read them into pandas
 df = pd.DataFrame([])
 for folder in folderlist:
-  files = glob.glob('voices'+folder+'/**/*.flac',recursive=True)
+  files = glob.glob('voices/'+folder+'/**/*.flac',recursive=True)
   dtf = pd.DataFrame(files);
   dtf = dtf.rename(columns={0:'path'})
+  print(dtf)
   dtf['file'] = [os.path.basename(val) for val in dtf['path']]
   dtf['speaker'] = folder
   df = pd.concat([df,dtf],ignore_index=True)

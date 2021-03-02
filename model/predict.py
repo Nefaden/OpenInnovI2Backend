@@ -45,6 +45,12 @@ import matplotlib.pyplot as plt
 import pulsar
 from pulsar.schema import *
 
+import logging
+import boto3
+import requests
+from botocore.exceptions import ClientError
+import tempfile
+
 # Shall be moved to server config later
 from dotenv import load_dotenv
 load_dotenv()
@@ -70,28 +76,40 @@ class Prediction(Record):
     name = String()
     speaker = Integer()
 
-#Pulsar = tfio.experimental.streaming.PulsarIODataset(service_url,topic,subscription,100,1,100)
-#tfio.IODataset()
 client = pulsar.Client(service_url, pulsar.AuthenticationToken(token))
-consumer = client.create_reader(topic,pulsar.MessageId.latest, receiver_queue_size=receiver_q_size, reader_name=subscription, schema=AvroSchema(File))
+consumer = client.create_reader(topic, pulsar.MessageId.latest, receiver_queue_size=receiver_q_size, reader_name=subscription, schema=AvroSchema(File))
 producer = client.create_producer(topic)
-# directory = os.fsencode('voices/')
 
-# Change speaker with the created room's ID (queue)
-# for file in os.listdir(directory):
-#       flac_name = os.fsdecode(file)
-#       producer.send(File(path='voices/' + flac_name, name=flac_name, speaker=103))
+# Generate a presigned URL for the S3 object
+session = boto3.session.Session(region_name="fr-par")
 
-# Although this function was modified and many parameteres were explored with, most of it
-# came from Source 8 (sources in the READ.ME)
+s3_client = session.client(
+    service_name='s3',
+    region_name=os.getenv("BUCKET_REGION"),
+    use_ssl=True,
+    endpoint_url='http://' + os.getenv("BUCKET_ENDPOINT"),
+    aws_access_key_id=os.getenv("BUCKET_ACCESS"),
+    aws_secret_access_key=os.getenv("BUCKET_SECRET")
+)
+
+bucket_name = os.getenv("BUCKET_NAME")
+object_name = "mardi à 13-04.m4a"
+
+# producer.send(File(path='VoicePerso/mardi à 13-04.m4a',name='mardi à 13-04.m4a',speaker=9112))
 
 def extract_features(files):    
     # Sets the name to be the path to where the file is in my computer
-    file_name = os.path.join(files.path)
+    # file_name = os.path.join(files.path)
+    file = tempfile.NamedTemporaryFile(delete=False)
+    file.write(response['Body'].read())
+    file.seek(0)
+    file.close()
+    print(file.name)
+    temp_file = os.path.join(file.name)
     
     # Loads the audio file as a floating point time series and assigns the default sample rate
     # Sample rate is set to 22050 by default
-    X, sample_rate = librosa.load(file_name, res_type='kaiser_fast')
+    X, sample_rate = librosa.load(temp_file, res_type='kaiser_fast')
     
     # Generate Mel-frequency cepstral coefficients (MFCCs) from a time series 
     mfccs = np.mean(librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=40).T,axis=0)
@@ -121,32 +139,33 @@ ss = load(os.getenv("SCALER"))
 lb = LabelEncoder()
 lb.fit(labels)
 while True:
-  msg = consumer.read_next()
-  st = pathlib.Path(os.getenv("MODEL")).stat().st_mtime
-  if st > stmTime :
-    stmTime = st
-    model = load_model(os.getenv("MODEL")) 
-    labels = np.load(os.getenv("CLASSES"))
-    ss = load(os.getenv("SCALER"))
-  model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam') 
-  content = msg.value()
-  file = pd.DataFrame([[content.path, content.name]], columns= ['path','file'])
-  features_label = file.apply(extract_features, axis=1)
-  # We create an empty list where we will concatenate all the features into one long feature
-  # for each file to feed into our neural network 
-  print(features_label[0])
-  features = []
-  for i in range(0, len(features_label)):
-      features.append(np.concatenate((features_label[i][0], features_label[i][1], 
-                  features_label[i][2], features_label[i][3],
-                  features_label[i][4]), axis=0))
-  X = np.array(features)
-  
-  X = ss.transform(X)
-  print(len(features))
-  preds = np.argmax(model.predict(X), axis=-1)
-  print(preds)
-  preds = lb.inverse_transform(preds)
-  print(preds)
-  producer = client.create_producer(content.user, schema=JsonSchema(Prediction))
-  producer.send(Prediction(path=content.path, name=content.name, speaker=int(preds[0])))
+    msg = consumer.read_next()
+    st = pathlib.Path(os.getenv("MODEL")).stat().st_mtime
+    if st > stmTime :
+        stmTime = st
+        model = load_model(os.getenv("MODEL")) 
+        labels = np.load(os.getenv("CLASSES"))
+        ss = load(os.getenv("MODEL"))
+    model.compile(loss='categorical_crossentropy', metrics=['accuracy'], optimizer='adam') 
+    dictionnary = json.loads(msg.data())
+    content = File(path=dictionnary['path'],name=dictionnary['name'],user=dictionnary['user'])
+    file = pd.DataFrame([[content.path,content.name]],columns= ['path','file'])
+    features_label = file.apply(extract_features, axis=1)
+    # We create an empty list where we will concatenate all the features into one long feature
+    # for each file to feed into our neural network 
+    print(features_label[0])
+    features = []
+    for i in range(0, len(features_label)):
+        features.append(np.concatenate((features_label[i][0], features_label[i][1], 
+                    features_label[i][2], features_label[i][3],
+                    features_label[i][4]), axis=0))
+    X = np.array(features)
+    
+    X = ss.transform(X)
+    print(len(features))
+    preds = np.argmax(model.predict(X), axis=-1)
+    print(preds)
+    preds = lb.inverse_transform(preds)
+    print(preds)
+    producer = client.create_producer(content.user,schema=JsonSchema(Prediction))
+    producer.send(Prediction(path=content.path,name=content.name,speaker=int(preds[0])))
