@@ -95,11 +95,8 @@ s3_client = session.client(
 bucket_name = os.getenv("BUCKET_NAME")
 object_name = "mardi à 13-04.m4a"
 
-# producer.send(File(path='VoicePerso/mardi à 13-04.m4a',name='mardi à 13-04.m4a',speaker=9112))
-
-def extract_features(files):    
-    # Sets the name to be the path to where the file is in my computer
-    # file_name = os.path.join(files.path)
+def extract_features(files):
+    response = s3_client.get_object(Bucket=bucket_name,Key=object_name)
     file = tempfile.NamedTemporaryFile(delete=False)
     file.write(response['Body'].read())
     file.seek(0)
@@ -129,6 +126,7 @@ def extract_features(files):
     # Computes the tonal centroid features (tonnetz)
     tonnetz = np.mean(librosa.feature.tonnetz(y=librosa.effects.harmonic(X),
     sr=sample_rate).T,axis=0)
+    os.remove(temp_file)
     return mfccs, chroma, mel, contrast, tonnetz
 
 model.summary()
