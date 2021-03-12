@@ -155,6 +155,24 @@ apt -y install automake autotools-dev fuse g++ git libcurl4-gnutls-dev libfuse-d
 * Twitter: [@YannDurand11](https://twitter.com/YannDurand11)
 * Github: [@Nefaden](https://github.com/Nefaden)
 
+## Other contributors
+
+👤 **Eddy Cheval**
+
+* Github: [@EddyCheval](https://github.com/EddyCheval)
+
+👤 **Alban Guillet**
+
+* Github: [@AlbanGuillet](https://github.com/AlbanGuillet)
+
+👤 **Simon Huet**
+
+* Github: [@SimonHuet](https://github.com/SimonHuet)
+
+👤 **Alexandre Rabreau**
+
+* Github: [@AlexandreRab](https://github.com/AlexandreRab)
+
 ## Show your support
 
 Give a ⭐️ if this project helped you!
