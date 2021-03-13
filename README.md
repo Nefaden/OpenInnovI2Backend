@@ -2,7 +2,14 @@
 ![Version](https://img.shields.io/badge/version-0.0.1-blue.svg?cacheSeconds=2592000)
 [![Twitter: YannDurand11](https://img.shields.io/twitter/follow/YannDurand11.svg?style=social)](https://twitter.com/YannDurand11)
 
-> Open Innovation's project IA prediction to predict actors by using his voice
+> Open Innovation's project IA prediction to predict actors by using his voice and training our model
+
+## All links
+
+* [BackOffice](https://github.com/AlbanGuillet/OpenInnovBackOffice)
+* [Homepage](https://g72ze0duasao.umso.co/)
+* [API](https://github.com/EddyCheval/AsaeyOinnovApi)
+* [FRONT](https://github.com/SimonHuet/who-s-that-actor-front)
 
 ## Install all dependencies
 
