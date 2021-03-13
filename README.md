@@ -4,12 +4,12 @@
 
 > Open Innovation's project IA prediction to predict actors by using his voice and training our model
 
-## All links
+## Every project links
 
-* [BackOffice](https://github.com/AlbanGuillet/OpenInnovBackOffice)
 * [Homepage](https://g72ze0duasao.umso.co/)
-* [API](https://github.com/EddyCheval/AsaeyOinnovApi)
 * [FRONT](https://github.com/SimonHuet/who-s-that-actor-front)
+* [BackOffice](https://github.com/AlbanGuillet/OpenInnovBackOffice)
+* [API](https://github.com/EddyCheval/AsaeyOinnovApi)
 
 ## Install all dependencies
 
@@ -162,11 +162,11 @@ apt -y install automake autotools-dev fuse g++ git libcurl4-gnutls-dev libfuse-d
 * Twitter: [@YannDurand11](https://twitter.com/YannDurand11)
 * Github: [@Nefaden](https://github.com/Nefaden)
 
-## Other contributors
-
 👤 **Eddy Cheval**
 
 * Github: [@EddyCheval](https://github.com/EddyCheval)
+
+## Other contributors
 
 👤 **Alban Guillet**
 
