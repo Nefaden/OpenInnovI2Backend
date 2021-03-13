@@ -154,7 +154,7 @@ Install s3fs
 apt -y install automake autotools-dev fuse g++ git libcurl4-gnutls-dev libfuse-dev libssl-dev libxml2-dev make pkg-config
 ```
 
-## Author
+## Authors
 
 👤 **Yann Durand**
 
